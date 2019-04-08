@@ -1,0 +1,295 @@
+
+
+PARSER_BEGIN(Parser)
+
+public class Parser {
+
+  public static void main(String args[]) throws ParseException {
+   Example scanner;
+       if (args.length == 0) {
+         System.out.println("JavaCC Scanner:  Reading from standard input . . .");
+         scanner = new Example(System.in);
+       } else if (args.length == 1) {
+         System.out.println("JavaCC Scanner:  Reading from file " + args[0] + " . . .");
+         try {
+           scanner = new Example(new java.io.FileInputStream(args[0]));
+         } catch (java.io.FileNotFoundException e) {
+           System.out.println("JavaCC Scanner:  File " + args[0] + " not found.");
+           return;
+         }
+       } else {
+         System.out.println("JavaCC Scanner:  Usage is one of:");
+         System.out.println("         java JavaCCScnaner < inputfile");
+         System.out.println("OR");
+         System.out.println("         java JavaCCScanner inputfile");
+         return;
+       }
+       try {
+         scanner.Start();
+         System.out.println("JavaCC Parser:  Java program parsed successfully.");
+       } catch (TokenMgrError e) {
+         System.out.println("tokenMGRERRORR");
+         System.out.println(e.getMessage());
+       }
+  }
+
+}
+
+
+PARSER_END(Parser)
+
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+
+SPECIAL_TOKEN : /* COMMENTS */
+{
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <FORMAL_COMMENT: "/**" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+
+TOKEN :  /* LOGICAL */
+{
+    <RelOp: "<" | "<=" | ">=" | ">">
+|
+    <EqualOp: "==" | "!=">
+|
+    <AddOp: "+" | "-" >
+|
+    <MulOp: "*" | "/" | "%">
+}
+
+void Literal():
+{}
+{
+	"True" | "False" | <number>
+}
+
+void Selector():
+{}
+{
+	( "[" Expr() "]" | "." <ident> )  [Selector()]
+}
+
+void ArrayLen():
+{}
+{
+	"#" <ident>  [Selector()]
+}
+
+void PrimaryExpr():
+{}
+{
+	Literal() | "(" Expr() ")" | ProcedureCall() | <ident> [ Selector()] | ArrayLen()
+}
+
+void UnaryExpr():
+{}
+{
+	(<AddOp>)? PrimaryExpr()
+}
+
+void MulExpr():
+{}
+{
+	UnaryExpr()  (<MulOp> UnaryExpr())*
+}
+
+void AddExpr():
+{}
+{
+	MulExpr() (<AddOp> MulExpr())*
+}
+
+void RelExpr():
+{}
+{
+	AddExpr() [ <RelOp> AddExpr() ]
+}
+
+void EqualExpr():
+{}
+{
+	RelExpr() [ <EqualOp> RelExpr()]
+}
+
+void CondAndExpr():
+{}
+{
+	EqualExpr() ( "And" EqualExpr() )*
+}
+
+void CreationExpr():
+{}
+{
+	"new" NonArrayType() ( "[" Expr() "]" )*
+}
+
+void Expr():
+{}
+{
+	CondAndExpr() ( "Or" CondAndExpr() )* | CreationExpr()
+}
+
+void ArgumentList():
+{}
+{
+	Expr() ( "," Expr() )*
+}
+
+void ProcedureCall():
+{}
+{
+	<ident> "(" [ ArgumentList() ] ")"
+}
+
+void Assignment():
+{}
+{
+	<ident> ( Selector() )? ":=" Expr()
+}
+
+void IfStatement():
+{}
+{
+	"If" Expr() "Then" StatementList() [ "Else" StatementList() ] "EndIf"
+}
+
+void WhileStatement():
+{}
+{
+	"While" Expr() "Do" StatementList() "EndWhile"
+}
+
+void ReturnStatement():
+{}
+{
+	"Return" [ Expr() ]
+}
+
+void WriteStatement():
+{}
+{
+	"Write" <string>
+}
+
+void Statement():
+{}
+{
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | Assignment() | ProcedureCall() | Block()
+}
+
+void StatementList():
+{}
+{
+	( Statement() ";" )*
+}
+
+void Block():
+{}
+{
+	( Decl() )? "Begin" StatementList() "End"
+}
+
+void NonArrayType():
+{}
+{
+	"int" | "bool" | <ident>
+}
+
+void Type():
+{}
+{
+	NonArrayType() ( "[" "]" )*
+}
+
+void ReturnType():
+{}
+{
+	"void" | Type()
+}
+
+void ConstDecl():
+{}
+{
+	Expr() ( "," Expr() )*
+}
+
+void VarDecl():
+{}
+{
+	<ident> "(" [ ArgumentList() ] ")"
+}
+
+void TypeDecl():
+{}
+{
+	<ident> ( Selector() )? ":=" Expr()
+}
+
+void Decl():
+{}
+{
+	"If" Expr() "Then" StatementList() ( "Else" StatementList() )? "EndIf"
+}
+
+void FormalParam():
+{}
+{
+	"While" Expr() "Do" StatementList() "EndWhile"
+}
+
+void FormalParamList():
+{}
+{
+	"Return" [ Expr() ]
+}
+
+void Procedure():
+{}
+{
+	"Write" <string>
+}
+
+void Program():
+{}
+{
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | Assignment() | ProcedureCall() | Block()
+}
+
+TOKEN : /* LITERALS */
+{
+    <digit: ["0"-"9"] >
+|
+    <letter: ["A"-"Z"]|["a"-"z"]|"_">
+|
+    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
+                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
+                         | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
+|
+    <ident: <letter> ( <letter> | <digit> )*>
+|
+    <number: <digit> ( <digit> )*>
+|
+    <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
+}
+
+
+void Start() : { Token t; } {
+     {
+         do {
+             t = getNextToken();
+             System.out.println(t.toString());
+         } while (t.kind != EOF);
+     }
+
+     <EOF>
+}

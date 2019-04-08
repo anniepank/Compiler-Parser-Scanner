@@ -1,0 +1,74 @@
+TOKEN : /* LOGICAL */
+{
+    <Literal: "True" | "False" | <number>>
+|
+    <Selector: ( "[" <Expr> "]" | "." <ident> )  (<Selector>)?  >
+|
+    <ArrayLen: "#" <ident>  (<Selector>)? >
+|
+    <PrimaryExpr: <Literal> | "(" <Expr> ")" | <ProcedureCall> | <ident> (<Selector>)? | <ArrayLen>>
+|
+    <UnaryExpr: (<AddOp>)? <PrimaryExpr>>
+|
+    <MulExpr: <UnaryExpr>  (<MulOp> <UnaryExpr>)*>
+|
+    <AddExpr: <MulExpr> (<AddOp> <MulExpr>)*>
+|
+    <RelExpr: <AddExpr> (<RelOp> <AddExpr>)?>
+|
+    <EqualExpr: <RelExpr> ( <EqualOp> <RelExpr>)?  >
+|
+    <CondAndExpr: <EqualExpr> ( "And" <EqualExpr> )* >
+|
+    <CreationExpr: "new" <NonArrayType> ( "[" <Expr> "]" )*>
+|
+    <Expr: <CondAndExpr> ( "Or" <CondAndExpr> )* | <CreationExpr>>
+}
+
+TOKEN : /* Argument */
+{
+    <ArgumentList: <Expr> ( "," <Expr> )* >
+|
+    <ProcedureCall: <ident> "(" ( <ArgumentList> )? ")" >
+|
+    <Assignment: <ident> ( <Selector> )? ":=" <Expr> >
+|
+    <IfStatement: "If" <Expr> "Then" <StatementList> ( "Else" <StatementList> )? "EndIf">
+|
+    <WhileStatement: "While" <Expr> "Do" <StatementList> "EndWhile">
+|
+    <ReturnStatement: "Return" ( <Expr> )? >
+|
+    <WriteStatement: "Write" <string>>
+|
+    <Statement: <IfStatement> | <WhileStatement> | <ReturnStatement> | <WriteStatement> | <Assignment> | <ProcedureCall> | <Block>>
+|
+    <StatementList: ( <Statement> ";" )*  >
+|
+    <Block: ( <Decl> )? "Begin" <StatementList> "End" >
+|
+    <NonArrayType: "int" | "bool" | <ident>>
+|
+    <Type: <NonArrayType> ( "[" "]" )*>
+|
+    <ReturnType: "void" | <Type>>
+}
+
+TOKEN : /* Argument */
+{
+    <ConstDecl: <Expr> ( "," <Expr> )* >
+|
+    <VarDecl: <ident> "(" ( <ArgumentList> )? ")" >
+|
+    <TypeDecl: <ident> ( <Selector> )? ":=" <Expr> >
+|
+    <Decl: "If" <Expr> "Then" <StatementList> ( "Else" <StatementList> )? "EndIf">
+|
+    <FormalParam: "While" <Expr> "Do" <StatementList> "EndWhile">
+|
+    <FormalParamList: "Return" ( <Expr> )? >
+|
+    <Procedure: "Write" <string>>
+|
+    <Program: <IfStatement> | <WhileStatement> | <ReturnStatement> | <WriteStatement> | <Assignment> | <ProcedureCall> | <Block>>
+}
