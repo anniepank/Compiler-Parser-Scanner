@@ -1,18 +1,16 @@
-
-
 PARSER_BEGIN(Parser)
 
 public class Parser {
 
   public static void main(String args[]) throws ParseException {
-   Example scanner;
+   Parser scanner;
        if (args.length == 0) {
          System.out.println("JavaCC Scanner:  Reading from standard input . . .");
-         scanner = new Example(System.in);
+         scanner = new Parser(System.in);
        } else if (args.length == 1) {
          System.out.println("JavaCC Scanner:  Reading from file " + args[0] + " . . .");
          try {
-           scanner = new Example(new java.io.FileInputStream(args[0]));
+           scanner = new Parser(new java.io.FileInputStream(args[0]));
          } catch (java.io.FileNotFoundException e) {
            System.out.println("JavaCC Scanner:  File " + args[0] + " not found.");
            return;
@@ -67,6 +65,25 @@ TOKEN :  /* LOGICAL */
     <MulOp: "*" | "/" | "%">
 }
 
+
+TOKEN : /* LITERALS */
+{
+    <digit: ["0"-"9"] >
+|
+    <letter: ["A"-"Z"]|["a"-"z"]|"_">
+|
+    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
+                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
+                         | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
+|
+    <ident: <letter> ( <letter> | <digit> )*>
+|
+    <number: <digit> ( <digit> )*>
+|
+    <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
+}
+
+
 void Literal():
 {}
 {
@@ -88,7 +105,13 @@ void ArrayLen():
 void PrimaryExpr():
 {}
 {
-	Literal() | "(" Expr() ")" | ProcedureCall() | <ident> [ Selector()] | ArrayLen()
+	 Literal() | "(" Expr() ")" | <ident> A() | ArrayLen()
+}
+
+void A():
+{}
+{
+    [ Selector() ] | "(" [ ArgumentList() ] ")"
 }
 
 void UnaryExpr():
@@ -157,6 +180,12 @@ void Assignment():
 	<ident> ( Selector() )? ":=" Expr()
 }
 
+void B():
+{}
+{
+    ( Selector() )? ":=" Expr() | "(" [ ArgumentList() ] ")"
+}
+
 void IfStatement():
 {}
 {
@@ -184,7 +213,7 @@ void WriteStatement():
 void Statement():
 {}
 {
-	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | Assignment() | ProcedureCall() | Block()
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | <ident> B() | Block()
 }
 
 void StatementList():
@@ -262,26 +291,8 @@ void Procedure():
 void Program():
 {}
 {
-	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | Assignment() | ProcedureCall() | Block()
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | <ident> B() | Block()
 }
-
-TOKEN : /* LITERALS */
-{
-    <digit: ["0"-"9"] >
-|
-    <letter: ["A"-"Z"]|["a"-"z"]|"_">
-|
-    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
-                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
-                         | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
-|
-    <ident: <letter> ( <letter> | <digit> )*>
-|
-    <number: <digit> ( <digit> )*>
-|
-    <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
-}
-
 
 void Start() : { Token t; } {
      {
