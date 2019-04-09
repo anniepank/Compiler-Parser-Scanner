@@ -86,6 +86,7 @@ public interface ParserConstants {
     "\"int\"",
     "\"bool\"",
     "\"void\"",
+    "\"Program\"",
   };
 
 }
