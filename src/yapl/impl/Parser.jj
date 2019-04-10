@@ -108,7 +108,8 @@ void ArrayLen():
 void PrimaryExpr():
 {}
 {
-	 Literal() | "(" Expr() ")" | <ident> A() | ArrayLen()
+
+	 Literal() | "(" Expr() ")" | LOOKAHEAD(2) ProcedureCall() | LOOKAHEAD(2) <ident> [ Selector() ] |  ArrayLen()
 }
 
 void A():
@@ -216,7 +217,8 @@ void WriteStatement():
 void Statement():
 {}
 {
-	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | <ident> B() | Block()
+
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | LOOKAHEAD(2) ProcedureCall()| LOOKAHEAD(2) Assignment() | Block()
 }
 
 void StatementList():
@@ -311,6 +313,11 @@ String Program():
 
 TOKEN : /* LITERALS */
 {
+
+    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
+                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
+               | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
+|
     <ident: <letter> ( <letter> | <digit> )*>
 |
     <letter: ["A"-"Z"]|["a"-"z"]|"_">
@@ -320,9 +327,5 @@ TOKEN : /* LITERALS */
     <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
 |
     <digit: ["0"-"9"] >
-|
-    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
-                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
-                       | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
 
 }

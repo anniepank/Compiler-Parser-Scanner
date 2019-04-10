@@ -15,17 +15,17 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int MULTI_LINE_COMMENT = 7;
   /** RegularExpression Id. */
-  int ident = 54;
+  int otherchar = 54;
   /** RegularExpression Id. */
-  int letter = 55;
+  int ident = 55;
   /** RegularExpression Id. */
-  int number = 56;
+  int letter = 56;
   /** RegularExpression Id. */
-  int string = 57;
+  int number = 57;
   /** RegularExpression Id. */
-  int digit = 58;
+  int string = 58;
   /** RegularExpression Id. */
-  int otherchar = 59;
+  int digit = 59;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -86,12 +86,12 @@ public interface ParserConstants {
     "\"Declare\"",
     "\"Procedure\"",
     "\"Program \"",
+    "<otherchar>",
     "<ident>",
     "<letter>",
     "<number>",
     "<string>",
     "<digit>",
-    "<otherchar>",
   };
 
 }
