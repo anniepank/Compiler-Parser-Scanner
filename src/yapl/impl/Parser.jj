@@ -1,10 +1,15 @@
 options {
-  DEBUG_TOKEN_MANAGER = true;
+  DEBUG_TOKEN_MANAGER = false;
 }
 
 PARSER_BEGIN(Parser)
 
 public class Parser {
+  private static int line;
+  private static int column;
+  private static int errorNo;
+  private static String detailedErrorMessage;
+  private static String program;
 
   public static void main(String args[]) throws ParseException {
    Parser parser;
@@ -27,12 +32,14 @@ public class Parser {
          return;
        }
        try {
-         String program = parser.Program();
+         program = parser.Program();
 
          System.out.println("YAPL compilation: " + program + " OK");
        } catch (TokenMgrError e) {
-         System.out.println("tokenMGRERRORR");
+         System.out.println("YAPL compilation: TokenError" + program + "ERROR");
          System.out.println(e.getMessage());
+       } catch (ParseException e) {
+         System.out.println("YAPL compilation: ParseException" + program + "ERROR");
        }
   }
 
