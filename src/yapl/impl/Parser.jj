@@ -27,12 +27,9 @@ public class Parser {
          return;
        }
        try {
-         //parser.Start();
          String program = parser.Program();
-         System.out.print("PROGRAM IS ");
-         System.out.print(program);
 
-         System.out.println("YAPL compilation: [<program>]" + program + " OK");
+         System.out.println("YAPL compilation: " + program + " OK");
        } catch (TokenMgrError e) {
          System.out.println("tokenMGRERRORR");
          System.out.println(e.getMessage());
@@ -109,13 +106,13 @@ void PrimaryExpr():
 {}
 {
 
-	 Literal() | "(" Expr() ")" | LOOKAHEAD(2) ProcedureCall() | LOOKAHEAD(2) <ident> [ Selector() ] |  ArrayLen()
+	 Literal() | "(" Expr() ")" | <ident> A() | ArrayLen()
 }
 
 void A():
 {}
 {
-    [ Selector() ] | "(" [ ArgumentList() ] ")"
+     "(" [ ArgumentList() ] ")" | [ Selector() ]
 }
 
 void UnaryExpr():
@@ -184,11 +181,6 @@ void Assignment():
 	<ident> ( Selector() )? ":=" Expr()
 }
 
-void B():
-{}
-{
-    ( Selector() )? ":=" Expr() | "(" [ ArgumentList() ] ")"
-}
 
 void IfStatement():
 {}
@@ -218,7 +210,13 @@ void Statement():
 {}
 {
 
-	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | LOOKAHEAD(2) ProcedureCall()| LOOKAHEAD(2) Assignment() | Block()
+	IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | <ident> B() | Block()
+}
+
+void B():
+{}
+{
+    "(" [ ArgumentList() ] ")" | ( Selector() )? ":=" Expr()
 }
 
 void StatementList():
