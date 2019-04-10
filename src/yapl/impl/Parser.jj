@@ -86,23 +86,6 @@ void MulOp():
 "*" | "/" | "%"
 }
 
-TOKEN : /* LITERALS */
-{
-    <digit: ["0"-"9"] >
-|
-    <letter: ["A"-"Z"]|["a"-"z"]|"_">
-|
-    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
-                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
-                         | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
-|
-    <ident: <letter> ( <letter> | <digit> )*>
-|
-    <number: <digit> ( <digit> )*>
-|
-    <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
-}
-
 
 void Literal():
 {}
@@ -248,6 +231,13 @@ void Block():
 	( Decl() )? "Begin" StatementList() "End"
 }
 
+
+void FormalParam():
+{}
+{
+	Type() <ident>
+}
+
 void NonArrayType():
 {}
 {
@@ -290,11 +280,6 @@ void Decl():
 	"Declare" ( ConstDecl() | VarDecl() | TypeDecl() )*
 }
 
-void FormalParam():
-{}
-{
-	Type() <ident>
-}
 
 void FormalParamList():
 {}
@@ -314,21 +299,30 @@ String Program():
     String res = "";
 }
 {
-	"Program " program = <ident>
-	 {res = program.toString(); } (Decl() | Procedure())*
+	"Program " program = <ident> (Decl() | Procedure())*
 	 "Begin" StatementList() "End" <ident> "."
+	 {res = program.toString(); }
 	 {
 	    return res;
 	 }
 }
 
-void Start() : { Token t; } {
-     {
-         do {
-             t = getNextToken();
-             System.out.println(t.toString());
-         } while (t.kind != EOF);
-     }
 
-     <EOF>
+
+TOKEN : /* LITERALS */
+{
+    <ident: <letter> ( <letter> | <digit> )*>
+|
+    <letter: ["A"-"Z"]|["a"-"z"]|"_">
+|
+    <number: <digit> ( <digit> )*>
+|
+    <string:"\"" ( " " | <letter> | <digit> | <otherchar> )* "\"">
+|
+    <digit: ["0"-"9"] >
+|
+    <otherchar:"+" | "-" | "*" | "/" | "." | "," | ";" | ":" | "!"
+                         | "?" | "=" | "#" | "%" | "<" | ">" | "$" | "(" | ")"
+                       | "[" | "]" | "{" | "}" | "\\" | "@" | "&" | "^" | "|">
+
 }

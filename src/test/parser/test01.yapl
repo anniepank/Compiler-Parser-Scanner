@@ -10,7 +10,7 @@ Declare
 
 Procedure int func(int[] arr, int i)
 Begin
-	Return arr[#arr-1] * arr[i];
+	Return arr[#arr - 1] * arr[i];
 End func;
 
 Procedure int[] createArray(int i)
@@ -40,7 +40,7 @@ Declare
 	int[] arr;
     int r;
 Begin
-    arr := createArray(len);
+    arr := createArray(len + 1);
 	arr[0] := 10;
 	arr[len-1] := 9;
 	r := func(arr, 0);
