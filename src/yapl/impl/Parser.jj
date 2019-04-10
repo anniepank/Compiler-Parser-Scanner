@@ -1,5 +1,5 @@
 options {
-  DEBUG_TOKEN_MANAGER = false;
+  DEBUG_TOKEN_MANAGER = true;
 }
 
 PARSER_BEGIN(Parser)
@@ -27,9 +27,12 @@ public class Parser {
          return;
        }
        try {
-         parser.Start();
-         String program = parser.Parse();
-         System.out.println("YAPL compilation: " + program + " OK");
+         //parser.Start();
+         String program = parser.Program();
+         System.out.print("PROGRAM IS ");
+         System.out.print(program);
+
+         System.out.println("YAPL compilation: [<program>]" + program + " OK");
        } catch (TokenMgrError e) {
          System.out.println("tokenMGRERRORR");
          System.out.println(e.getMessage());
@@ -59,18 +62,29 @@ SPECIAL_TOKEN : /* COMMENTS */
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-
-TOKEN :  /* LOGICAL */
+void RelOp():
+{}
 {
-    <RelOp: "<" | "<=" | ">=" | ">">
-|
-    <EqualOp: "==" | "!=">
-|
-    <AddOp: "+" | "-" >
-|
-    <MulOp: "*" | "/" | "%">
+"<" | "<=" | ">=" | ">"
 }
 
+void EqualOp():
+{}
+{
+"==" | "!="
+}
+
+void AddOp():
+{}
+{
+"+" | "-"
+}
+
+void MulOp():
+{}
+{
+"*" | "/" | "%"
+}
 
 TOKEN : /* LITERALS */
 {
@@ -123,31 +137,31 @@ void A():
 void UnaryExpr():
 {}
 {
-	(<AddOp>)? PrimaryExpr()
+	(AddOp())? PrimaryExpr()
 }
 
 void MulExpr():
 {}
 {
-	UnaryExpr()  (<MulOp> UnaryExpr())*
+	UnaryExpr()  (MulOp() UnaryExpr())*
 }
 
 void AddExpr():
 {}
 {
-	MulExpr() (<AddOp> MulExpr())*
+	MulExpr() (AddOp() MulExpr())*
 }
 
 void RelExpr():
 {}
 {
-	AddExpr() [ <RelOp> AddExpr() ]
+	AddExpr() [ RelOp() AddExpr() ]
 }
 
 void EqualExpr():
 {}
 {
-	RelExpr() [ <EqualOp> RelExpr()]
+	RelExpr() [ EqualOp() RelExpr()]
 }
 
 void CondAndExpr():
@@ -255,77 +269,59 @@ void ReturnType():
 void ConstDecl():
 {}
 {
-	Expr() ( "," Expr() )*
+    "Const" <ident> "=" Literal() ";"
 }
 
 void VarDecl():
 {}
 {
-	<ident> "(" [ ArgumentList() ] ")"
+	Type() <ident> ("," <ident>)* ";"
 }
 
 void TypeDecl():
 {}
 {
-	<ident> ( Selector() )? ":=" Expr()
+    "Record" <ident> VarDecl() (VarDecl())* "EndRecord" ";"
 }
 
 void Decl():
 {}
 {
-	"If" Expr() "Then" StatementList() ( "Else" StatementList() )? "EndIf"
+	"Declare" ( ConstDecl() | VarDecl() | TypeDecl() )*
 }
 
 void FormalParam():
 {}
 {
-	"While" Expr() "Do" StatementList() "EndWhile"
+	Type() <ident>
 }
 
 void FormalParamList():
 {}
 {
-	"Return" [ Expr() ]
+    FormalParam() ("," FormalParam())*
 }
 
 void Procedure():
 {}
 {
-	"Write" <string>
-}
-
-String ProgramBegin():
-{
-    Token str = null;
-}
-{
-    "Program" str = <ident>
-    {
-        return str.toString();
-    }
+	"Procedure" ReturnType() <ident> "(" [FormalParamList() ] ")" Block() <ident> ";"
 }
 
 String Program():
 {
-    String program = null;
+    Token program = null;
+    String res = "";
 }
 {
-	program = ProgramBegin() ( IfStatement() | WhileStatement() | ReturnStatement() | WriteStatement() | <ident> B() | Block())
-	{
-	    return program.toString();
-	}
+	"Program " program = <ident>
+	 {res = program.toString(); } (Decl() | Procedure())*
+	 "Begin" StatementList() "End" <ident> "."
+	 {
+	    return res;
+	 }
 }
 
-String Parse():
-{
-    String result = "";
-}
-{
-    result = Program()| <EOF>
-    {
-        return result;
-    }
-}
 void Start() : { Token t; } {
      {
          do {

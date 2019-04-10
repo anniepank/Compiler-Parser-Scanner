@@ -15,25 +15,17 @@ public interface ParserConstants {
   /** RegularExpression Id. */
   int MULTI_LINE_COMMENT = 7;
   /** RegularExpression Id. */
-  int RelOp = 8;
+  int digit = 19;
   /** RegularExpression Id. */
-  int EqualOp = 9;
+  int letter = 20;
   /** RegularExpression Id. */
-  int AddOp = 10;
+  int otherchar = 21;
   /** RegularExpression Id. */
-  int MulOp = 11;
+  int ident = 22;
   /** RegularExpression Id. */
-  int digit = 12;
+  int number = 23;
   /** RegularExpression Id. */
-  int letter = 13;
-  /** RegularExpression Id. */
-  int otherchar = 14;
-  /** RegularExpression Id. */
-  int ident = 15;
-  /** RegularExpression Id. */
-  int number = 16;
-  /** RegularExpression Id. */
-  int string = 17;
+  int string = 24;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -48,10 +40,17 @@ public interface ParserConstants {
     "<SINGLE_LINE_COMMENT>",
     "<FORMAL_COMMENT>",
     "<MULTI_LINE_COMMENT>",
-    "<RelOp>",
-    "<EqualOp>",
-    "<AddOp>",
-    "<MulOp>",
+    "\"<\"",
+    "\"<=\"",
+    "\">=\"",
+    "\">\"",
+    "\"==\"",
+    "\"!=\"",
+    "\"+\"",
+    "\"-\"",
+    "\"*\"",
+    "\"/\"",
+    "\"%\"",
     "<digit>",
     "<letter>",
     "<otherchar>",
@@ -86,7 +85,13 @@ public interface ParserConstants {
     "\"int\"",
     "\"bool\"",
     "\"void\"",
-    "\"Program\"",
+    "\"Const\"",
+    "\"=\"",
+    "\"Record\"",
+    "\"EndRecord\"",
+    "\"Declare\"",
+    "\"Procedure\"",
+    "\"Program \"",
   };
 
 }
