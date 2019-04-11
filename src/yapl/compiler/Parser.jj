@@ -9,7 +9,7 @@ public class Parser {
   private static int column;
   private static int errorNo;
   private static String detailedErrorMessage;
-  private static String program;
+  private static String programName;
 
   public static void main(String args[]) throws ParseException {
    Parser parser;
@@ -32,14 +32,12 @@ public class Parser {
          return;
        }
        try {
-         program = parser.Program();
-
-         System.out.println("YAPL compilation: " + program + " OK");
-       } catch (TokenMgrError e) {
-         System.out.println("YAPL compilation: TokenError " + program + "ERROR");
-         System.out.println(e.getMessage());
+         programName = parser.Program();
+         CompilerMessage.printOK(programName);
        } catch (ParseException e) {
-         System.out.println("YAPL compilation: ParseException" + program + "ERROR");
+           CompilerMessage.printError(e, programName);
+       } catch(TokenMgrError e) {
+           CompilerMessage.printError(e, programName);
        }
   }
 
@@ -308,7 +306,10 @@ String Program():
 {
 	"Program " program = <ident> (Decl() | Procedure())*
 	 "Begin" StatementList() "End" <ident> "."
-	 {res = program.toString(); }
+	 {
+	    res = program.toString();
+	    programName = res;
+	 }
 	 {
 	    return res;
 	 }

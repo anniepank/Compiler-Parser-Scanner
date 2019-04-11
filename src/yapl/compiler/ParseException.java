@@ -2,7 +2,6 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package yapl.compiler;
 
-import org.javacc.parser.Token;
 import yapl.interfaces.CompilerError;
 
 /**

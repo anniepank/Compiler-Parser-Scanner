@@ -4,7 +4,7 @@
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (without unicode processing).
  */
-
+package yapl.compiler;
 public class SimpleCharStream
 {
 /** Whether parser is static. */
